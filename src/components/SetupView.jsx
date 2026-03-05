@@ -9,9 +9,10 @@ export default function SetupView({ S, setS, startTournament, isAdmin }) {
     const [type, setType] = useState(null);
     const [count, setCount] = useState('24');
     const [names, setNames] = useState([]);
+    const [tournamentName, setTournamentName] = useState('');
 
     useEffect(() => {
-        if (step === 2) {
+        if (step === 3) {
             const n = parseInt(count) || 24;
             setNames(Array.from({ length: n }, (_, i) => ({ id: `p${i}`, name: '' })));
         }
@@ -28,11 +29,13 @@ export default function SetupView({ S, setS, startTournament, isAdmin }) {
     if (!isAdmin) {
         return (
             <div style={center}>
-                <div style={{ fontSize: 56, marginBottom: 8 }}>🎯</div>
-                <h1 style={{ fontSize: 42, fontWeight: 900, color: '#fff', margin: '0 0 6px', letterSpacing: 3 }}>
-                    BOCCE TOURNAMENT
+                <img src="/marin-bocce-logo.png" alt="Marin Bocce" style={{ height: 120, marginBottom: 16 }} />
+                <h1 style={{ fontSize: 36, fontWeight: 900, color: '#fff', margin: '0 0 6px', letterSpacing: 3 }}>
+                    MARIN BOCCE
                 </h1>
-                <p style={{ color: MUTED, marginBottom: 24, fontSize: 18 }}>Match Day Manager</p>
+                <p style={{ color: GREEN, fontSize: 16, marginBottom: 24, letterSpacing: 2, fontWeight: 700 }}>
+                    TOURNAMENT TRACKER
+                </p>
                 <div style={{
                     background: CARD, border: `1px solid ${BORDER}`, borderRadius: 8,
                     padding: '24px 32px', display: 'inline-block'
@@ -48,13 +51,16 @@ export default function SetupView({ S, setS, startTournament, isAdmin }) {
         );
     }
 
+    // Step 0: Singles or Teams
     if (step === 0) return (
         <div style={center}>
-            <div style={{ fontSize: 56, marginBottom: 8 }}>🎯</div>
-            <h1 style={{ fontSize: 42, fontWeight: 900, color: '#fff', margin: '0 0 6px', letterSpacing: 3 }}>
-                BOCCE TOURNAMENT
+            <img src="/marin-bocce-logo.png" alt="Marin Bocce" style={{ height: 120, marginBottom: 16 }} />
+            <h1 style={{ fontSize: 36, fontWeight: 900, color: '#fff', margin: '0 0 6px', letterSpacing: 3 }}>
+                MARIN BOCCE
             </h1>
-            <p style={{ color: MUTED, marginBottom: 48, fontSize: 18 }}>Match Day Manager</p>
+            <p style={{ color: GREEN, fontSize: 16, marginBottom: 48, letterSpacing: 2, fontWeight: 700 }}>
+                TOURNAMENT TRACKER
+            </p>
             <p style={{ color: LIGHT, marginBottom: 16, fontSize: 16, letterSpacing: 1 }}>SINGLES OR TEAMS?</p>
             <div style={{ display: 'flex', gap: 16, justifyContent: 'center', marginBottom: 32 }}>
                 {['Singles', 'Teams'].map(t => (
@@ -71,7 +77,32 @@ export default function SetupView({ S, setS, startTournament, isAdmin }) {
         </div>
     );
 
+    // Step 1: Tournament Name
     if (step === 1) return (
+        <div style={center}>
+            <h2 style={{ color: '#fff', marginBottom: 8, fontSize: 30, letterSpacing: 2 }}>
+                TOURNAMENT NAME
+            </h2>
+            <p style={{ color: MUTED, marginBottom: 24 }}>Give this tournament a name</p>
+            <input
+                style={{ ...inp, fontSize: 22, textAlign: 'center', maxWidth: 400, margin: '0 auto 24px', display: 'block' }}
+                value={tournamentName}
+                onChange={e => setTournamentName(e.target.value)}
+                placeholder="e.g. Spring Classic 2026"
+                autoFocus
+            />
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+                <Btn variant="secondary" onClick={() => setStep(0)}>← Back</Btn>
+                <Btn onClick={() => {
+                    setS(p => ({ ...p, tournamentName: tournamentName.trim() || 'Unnamed Tournament' }));
+                    setStep(2);
+                }}>Continue →</Btn>
+            </div>
+        </div>
+    );
+
+    // Step 2: Player Count
+    if (step === 2) return (
         <div style={center}>
             <h2 style={{ color: '#fff', marginBottom: 8, fontSize: 30, letterSpacing: 2 }}>
                 HOW MANY {S.isTeams ? 'TEAMS' : 'PLAYERS'}?
@@ -82,17 +113,25 @@ export default function SetupView({ S, setS, startTournament, isAdmin }) {
             {parseInt(count) % 4 !== 0 && (
                 <p style={{ color: YELLOW, marginBottom: 16 }}>⚠ {count} is not divisible by 4</p>
             )}
-            <Btn onClick={() => setStep(2)} disabled={parseInt(count) % 4 !== 0}>Continue →</Btn>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+                <Btn variant="secondary" onClick={() => setStep(1)}>← Back</Btn>
+                <Btn onClick={() => setStep(3)} disabled={parseInt(count) % 4 !== 0}>Continue →</Btn>
+            </div>
         </div>
     );
 
+    // Step 3: Player Names
     return (
         <div style={{ maxWidth: 660, margin: '0 auto' }}>
             <h2 style={{ color: '#fff', marginBottom: 4, fontSize: 26, letterSpacing: 2 }}>
                 ENTER {S.isTeams ? 'TEAM' : 'PLAYER'} NAMES
             </h2>
-            <p style={{ color: MUTED, marginBottom: 20, fontSize: 14 }}>
+            <p style={{ color: MUTED, marginBottom: 4, fontSize: 14 }}>
+                {S.tournamentName && <span style={{ color: GREEN, fontWeight: 700 }}>{S.tournamentName} — </span>}
                 Will be randomly assigned to Pods A–F (4 per pod)
+            </p>
+            <p style={{ color: MUTED, marginBottom: 20, fontSize: 12 }}>
+                {S.isTeams ? 'Teams' : 'Singles'} · {count} {S.isTeams ? 'teams' : 'players'}
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 20 }}>
                 {names.map((p, i) => (
@@ -104,6 +143,7 @@ export default function SetupView({ S, setS, startTournament, isAdmin }) {
                 ))}
             </div>
             <div style={{ display: 'flex', gap: 12 }}>
+                <Btn variant="secondary" onClick={() => setStep(2)}>← Back</Btn>
                 <Btn disabled={!canStart} onClick={() => startTournament(names.map(p => ({ ...p, name: p.name.trim() })))}>
                     🎯 Start Tournament
                 </Btn>

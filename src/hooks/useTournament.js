@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { BLANK_STATE } from '../logic/constants';
+import { BLANK_STATE, BLANK_TOURNAMENT } from '../logic/constants';
 import { saveTournament, subscribeTournament } from '../firebase/tournament';
 
 /**
@@ -68,12 +68,47 @@ export function useTournament(isAdmin) {
 
     const resetState = useCallback(() => {
         isRemoteUpdate.current = false;
-        setStateRaw(BLANK_STATE);
-        localStorage.removeItem('bocce_v5');
-        if (isAdmin) {
-            saveTournament(BLANK_STATE);
-        }
+        setStateRaw(prev => {
+            const newState = { ...BLANK_TOURNAMENT, history: prev.history || [] };
+            localStorage.setItem('bocce_v5', JSON.stringify(newState));
+            if (isAdmin) saveTournament(newState);
+            return newState;
+        });
     }, [isAdmin]);
 
-    return [state, setState, resetState];
+    const archiveTournament = useCallback(() => {
+        isRemoteUpdate.current = false;
+        setStateRaw(prev => {
+            const archive = {
+                tournamentName: prev.tournamentName || 'Unnamed Tournament',
+                date: new Date().toISOString(),
+                isTeams: prev.isTeams,
+                players: prev.players,
+                pods: prev.pods,
+                podGames: prev.podGames,
+                bracketSeeds: prev.bracketSeeds,
+                bracketGames: prev.bracketGames,
+                phase: prev.phase,
+            };
+            const history = [...(prev.history || []), archive];
+            const newState = { ...BLANK_TOURNAMENT, history };
+            localStorage.setItem('bocce_v5', JSON.stringify(newState));
+            if (isAdmin) saveTournament(newState);
+            return newState;
+        });
+    }, [isAdmin]);
+
+    const deleteHistoryItem = useCallback((index) => {
+        isRemoteUpdate.current = false;
+        setStateRaw(prev => {
+            const history = [...(prev.history || [])];
+            history.splice(index, 1);
+            const newState = { ...prev, history };
+            localStorage.setItem('bocce_v5', JSON.stringify(newState));
+            if (isAdmin) saveTournament(newState);
+            return newState;
+        });
+    }, [isAdmin]);
+
+    return [state, setState, resetState, archiveTournament, deleteHistoryItem];
 }

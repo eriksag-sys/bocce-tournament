@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { BLANK_STATE, COLORS, POD_NAMES, COURT_ORDER, RR, shuffle } from './logic/constants';
+import { BLANK_STATE, BLANK_TOURNAMENT, COLORS, POD_NAMES, COURT_ORDER, RR, shuffle } from './logic/constants';
 import { assignCourts } from './logic/courts';
 import { calcStandings } from './logic/standings';
 import { generateBracket, advanceBracketGame } from './logic/bracket';
@@ -11,10 +11,12 @@ import GamesView from './components/GamesView';
 import StandingsView from './components/StandingsView';
 import BracketView from './components/BracketView';
 import ScoreModal from './components/ScoreModal';
+import WinnersView from './components/WinnersView';
+import HistoryView from './components/HistoryView';
 
 export default function App() {
     const { user, loading, isAdmin } = useAuth();
-    const [S, setS, resetState] = useTournament(isAdmin);
+    const [S, setS, resetState, archiveTournament, deleteHistoryItem] = useTournament(isAdmin);
 
     const name = useCallback(
         id => (S.players.find(p => p.id === id) || { name: 'TBD' }).name,
@@ -22,6 +24,14 @@ export default function App() {
     );
 
     const st = S.phase !== 'setup' ? calcStandings(S.podGames, S.pods) : {};
+
+    // Auto-detect "finished" state (both finals completed)
+    const isFinished = S.phase === 'bracket' && S.bracketGames?.length > 0 &&
+        S.bracketGames.find(g => g.id === 'final')?.status === 'completed' &&
+        S.bracketGames.find(g => g.id === 'third')?.status === 'completed';
+
+    // If finished and tab is still 'bracket', switch to 'winners'
+    const effectiveTab = isFinished && S.tab === 'bracket' ? 'winners' : S.tab;
 
     // ── Start Tournament ──────────────────────────────────────────────────────
     const startTournament = useCallback((players) => {
@@ -45,8 +55,10 @@ export default function App() {
         const result = assignCourts(podGames, courts, queue);
 
         setS(prev => ({
-            ...BLANK_STATE,
-            phase: 'pods', isTeams: prev.isTeams, players, pods,
+            ...BLANK_TOURNAMENT,
+            history: prev.history || [],
+            phase: 'pods', isTeams: prev.isTeams, tournamentName: prev.tournamentName,
+            players, pods,
             podGames: result.games, courts: result.courts, queue: result.queue, tab: 'games'
         }));
     }, [setS]);
@@ -98,11 +110,20 @@ export default function App() {
 
     // ── Submit Bracket Score ──────────────────────────────────────────────────
     const submitBracketScore = useCallback((gameId, s1, s2) => {
-        setS(prev => ({
-            ...prev,
-            bracketGames: advanceBracketGame(prev.bracketGames, gameId, s1, s2),
-            scoreModal: null
-        }));
+        setS(prev => {
+            const newBracket = advanceBracketGame(prev.bracketGames, gameId, s1, s2);
+            // Check if tournament is finished after this score
+            const finalG = newBracket.find(g => g.id === 'final');
+            const thirdG = newBracket.find(g => g.id === 'third');
+            const justFinished = finalG?.status === 'completed' && thirdG?.status === 'completed';
+
+            return {
+                ...prev,
+                bracketGames: newBracket,
+                scoreModal: null,
+                tab: justFinished ? 'winners' : prev.tab
+            };
+        });
     }, [setS]);
 
     // ── Score Modal Handler ───────────────────────────────────────────────────
@@ -124,7 +145,7 @@ export default function App() {
                 display: 'flex', alignItems: 'center', justifyContent: 'center'
             }}>
                 <div style={{ textAlign: 'center' }}>
-                    <div style={{ fontSize: 48, marginBottom: 12 }}>🎯</div>
+                    <img src="/marin-bocce-logo.png" alt="Marin Bocce" style={{ height: 80, marginBottom: 12 }} />
                     <div style={{ color: COLORS.MUTED, fontSize: 16 }}>Loading...</div>
                 </div>
             </div>
@@ -137,28 +158,46 @@ export default function App() {
             background: COLORS.BG, color: COLORS.LIGHT, minHeight: '100vh'
         }}>
             <Header
-                phase={S.phase} tab={S.tab}
+                S={S}
                 setTab={t => setS(p => ({ ...p, tab: t }))}
                 onReset={resetState}
+                onArchive={archiveTournament}
                 isAdmin={isAdmin} user={user}
             />
 
-            <div style={{ padding: S.tab === 'bracket' ? '24px 20px' : 24 }}>
-                {S.phase === 'setup' && (
+            {/* Tournament name banner */}
+            {S.phase !== 'setup' && S.tournamentName && effectiveTab !== 'history' && (
+                <div style={{
+                    textAlign: 'center', padding: '6px 20px',
+                    background: COLORS.CARD, borderBottom: `1px solid ${COLORS.BORDER}`,
+                    fontSize: 14, fontWeight: 700, color: COLORS.GREEN, letterSpacing: 2
+                }}>
+                    {S.tournamentName}
+                </div>
+            )}
+
+            <div style={{ padding: effectiveTab === 'bracket' ? '24px 20px' : 24 }}>
+                {S.phase === 'setup' && effectiveTab !== 'history' && (
                     <SetupView S={S} setS={setS} startTournament={startTournament} isAdmin={isAdmin} />
                 )}
-                {S.phase !== 'setup' && S.tab === 'games' && (
+                {effectiveTab === 'history' && (
+                    <HistoryView history={S.history} isAdmin={isAdmin} onDelete={deleteHistoryItem} />
+                )}
+                {S.phase !== 'setup' && effectiveTab === 'games' && (
                     <GamesView S={S} name={name} setS={setS} isAdmin={isAdmin} />
                 )}
-                {S.phase !== 'setup' && S.tab === 'standings' && (
+                {S.phase !== 'setup' && effectiveTab === 'standings' && (
                     <StandingsView
                         st={st} name={name} phase={S.phase}
                         podGames={S.podGames} advanceToBracket={advanceToBracket}
                         isAdmin={isAdmin}
                     />
                 )}
-                {S.phase !== 'setup' && S.tab === 'bracket' && (
+                {S.phase !== 'setup' && effectiveTab === 'bracket' && (
                     <BracketView S={S} name={name} setS={setS} isAdmin={isAdmin} />
+                )}
+                {effectiveTab === 'winners' && (
+                    <WinnersView S={S} name={name} />
                 )}
             </div>
 

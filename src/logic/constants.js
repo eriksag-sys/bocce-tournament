@@ -44,9 +44,10 @@ export const POD_COLORS = {
 };
 
 // ─── BLANK STATE ────────────────────────────────────────────────────────────
-export const BLANK_STATE = {
+export const BLANK_TOURNAMENT = {
     phase: 'setup',
     isTeams: false,
+    tournamentName: '',
     players: [],
     pods: {},
     courts: Object.fromEntries(COURT_ORDER.map(c => [c, { gameId: null }])),
@@ -56,6 +57,11 @@ export const BLANK_STATE = {
     bracketSeeds: [],
     bracketGames: [],
     tab: 'games',
+};
+
+export const BLANK_STATE = {
+    ...BLANK_TOURNAMENT,
+    history: [],
 };
 
 // ─── HELPERS ────────────────────────────────────────────────────────────────
