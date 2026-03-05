@@ -9,7 +9,7 @@ export default function ScoreModal({ game, name, onSubmit, onClose }) {
     const [s2, setS2] = useState('');
     const n1 = parseInt(s1), n2 = parseInt(s2);
     const both = s1 !== '' && s2 !== '';
-    const valid = both && !isNaN(n1) && !isNaN(n2) && n1 !== n2 && n1 >= 0 && n2 >= 0 && (n1 === 12 || n2 === 12);
+    const valid = both && !isNaN(n1) && !isNaN(n2) && n1 !== n2 && n1 >= 0 && n2 >= 0 && n1 <= 12 && n2 <= 12 && (n1 === 12 || n2 === 12);
 
     const inp = {
         background: CARD, border: `1px solid ${BORDER}`, color: '#fff',
@@ -53,7 +53,7 @@ export default function ScoreModal({ game, name, onSubmit, onClose }) {
                             </div>
                             <input
                                 autoFocus={i === 0} style={inp} type="number"
-                                min={0} max={99} value={val}
+                                min={0} max={12} value={val}
                                 onChange={e => set(e.target.value)} placeholder="0"
                             />
                         </div>
@@ -64,7 +64,7 @@ export default function ScoreModal({ game, name, onSubmit, onClose }) {
                         color: YELLOW, fontSize: 13, marginBottom: 12,
                         padding: '8px 12px', background: YELLOW + '11', borderRadius: 4
                     }}>
-                        ⚠ One score must be 12. No ties allowed.
+                        ⚠ One score must be 12, none above 12. No ties.
                     </div>
                 )}
                 <div style={{ display: 'flex', gap: 10 }}>
