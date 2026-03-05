@@ -2,6 +2,15 @@ import { useState, useEffect } from 'react';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebase/config';
 
+// ─── ADMIN WHITELIST ────────────────────────────────────────────────────────
+// Only these email addresses get admin access.
+// Everyone else sees the read-only public view.
+const ADMIN_EMAILS = [
+    'eriksag@gmail.com',
+    // Add more admins here, e.g.:
+    // 'another-admin@gmail.com',
+];
+
 /**
  * Hook to track Firebase auth state.
  * Returns { user, loading, isAdmin }
@@ -21,6 +30,6 @@ export function useAuth() {
     return {
         user,
         loading,
-        isAdmin: !!user,  // Any authenticated user is an admin
+        isAdmin: !!user && ADMIN_EMAILS.includes(user.email),
     };
 }
