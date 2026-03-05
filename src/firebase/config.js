@@ -2,15 +2,14 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 
-// ─── PASTE YOUR FIREBASE CONFIG HERE ────────────────────────────────────────
-// Get this from Firebase Console → Project Settings → Your Apps → Web App
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.firebasestorage.app",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyDxqMtMYffVmyA65CKEgkC9eOPUxXV1yvY",
+    authDomain: "bocce-tournaments.firebaseapp.com",
+    projectId: "bocce-tournaments",
+    storageBucket: "bocce-tournaments.firebasestorage.app",
+    messagingSenderId: "321731864294",
+    appId: "1:321731864294:web:7cd579229d2ed050eefd27",
+    measurementId: "G-NY7Y1JN4BB"
 };
 
 const app = initializeApp(firebaseConfig);
