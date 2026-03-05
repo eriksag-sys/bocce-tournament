@@ -6,7 +6,7 @@ import { auth } from '../firebase/config';
 // Only these email addresses get admin access.
 // Everyone else sees the read-only public view.
 const ADMIN_EMAILS = [
-    'eriksag@gmail.com',
+    'eriksag@gmail.com', 'crowl.dan@gmail.com', 'j.bova.23@gmail.com'
     // Add more admins here, e.g.:
     // 'another-admin@gmail.com',
 ];
