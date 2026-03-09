@@ -20,29 +20,6 @@ export const B_COURTS = {
     4: ['E', 'F']
 };
 
-// ─── COLORS ─────────────────────────────────────────────────────────────────
-export const COLORS = {
-    BG: '#060a14',
-    PANEL: '#0b1020',
-    CARD: '#101828',
-    BORDER: '#1c2b47',
-    GREEN: '#00e676',
-    YELLOW: '#ffd740',
-    BLUE: '#40c4ff',
-    RED: '#ff5252',
-    MUTED: '#4a5a7a',
-    LIGHT: '#c0ccde',
-};
-
-export const POD_COLORS = {
-    A: COLORS.GREEN,
-    B: COLORS.BLUE,
-    C: COLORS.YELLOW,
-    D: '#ff6e40',
-    E: '#ea80fc',
-    F: '#80d8ff'
-};
-
 // ─── BLANK STATE ────────────────────────────────────────────────────────────
 export const BLANK_TOURNAMENT = {
     phase: 'setup',
@@ -53,6 +30,7 @@ export const BLANK_TOURNAMENT = {
     courts: Object.fromEntries(COURT_ORDER.map(c => [c, { gameId: null }])),
     podGames: [],
     queue: [],
+    courtHistory: {},
     scoreModal: null,
     bracketSeeds: [],
     bracketGames: [],

@@ -1,16 +1,18 @@
-import { COLORS, POD_NAMES, POD_COLORS } from '../logic/constants';
+import { useTheme } from '../ThemeContext';
+import { POD_NAMES } from '../logic/constants';
 import { Btn } from './ui';
 
-const { CARD, BORDER, PANEL, GREEN, BLUE, YELLOW, RED, MUTED, LIGHT } = COLORS;
-
 export default function StandingsView({ st, name, phase, podGames, advanceToBracket, isAdmin }) {
+    const { colors, podColors } = useTheme();
+    const { CARD, BORDER, PANEL, GREEN, BLUE, YELLOW, RED, MUTED, LIGHT, TEXT, DONE_BG } = colors;
+
     const allDone = podGames.every(g => g.status === 'completed');
 
     return (
         <div>
             {allDone && phase === 'pods' && (
                 <div style={{
-                    background: '#0b1a0f', border: `1px solid ${GREEN}`, borderRadius: 8,
+                    background: DONE_BG, border: `1px solid ${GREEN}`, borderRadius: 8,
                     padding: '16px 20px', marginBottom: 24, display: 'flex',
                     alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap'
                 }}>
@@ -43,8 +45,8 @@ export default function StandingsView({ st, name, phase, podGames, advanceToBrac
                                 borderBottom: `1px solid ${BORDER}`,
                                 display: 'flex', alignItems: 'center', gap: 10
                             }}>
-                                <div style={{ width: 10, height: 10, borderRadius: '50%', background: POD_COLORS[pod] }} />
-                                <span style={{ fontWeight: 900, fontSize: 17, letterSpacing: 2, color: '#fff' }}>POD {pod}</span>
+                                <div style={{ width: 10, height: 10, borderRadius: '50%', background: podColors[pod] }} />
+                                <span style={{ fontWeight: 900, fontSize: 17, letterSpacing: 2, color: TEXT }}>POD {pod}</span>
                             </div>
                             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
                                 <thead>
@@ -64,7 +66,7 @@ export default function StandingsView({ st, name, phase, podGames, advanceToBrac
                                         return (
                                             <tr key={p.id} style={{ borderTop: `1px solid ${BORDER}` }}>
                                                 <td style={{ padding: '10px 12px', color: rowCol, fontWeight: 800, fontSize: 16 }}>{i + 1}</td>
-                                                <td style={{ padding: '10px 12px', fontWeight: 600, color: '#fff', fontSize: 14 }}>{name(p.id)}</td>
+                                                <td style={{ padding: '10px 12px', fontWeight: 600, color: TEXT, fontSize: 14 }}>{name(p.id)}</td>
                                                 <td style={{ padding: '10px 12px', textAlign: 'center', color: GREEN, fontWeight: 700 }}>{p.wins}</td>
                                                 <td style={{
                                                     padding: '10px 12px', textAlign: 'center', fontWeight: 800,

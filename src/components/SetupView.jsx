@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
-import { COLORS } from '../logic/constants';
+import { useTheme } from '../ThemeContext';
 import { Btn } from './ui';
 
-const { CARD, BORDER, GREEN, YELLOW, MUTED, LIGHT, BG } = COLORS;
-
 export default function SetupView({ S, setS, startTournament, isAdmin }) {
+    const { colors } = useTheme();
+    const { CARD, BORDER, GREEN, YELLOW, MUTED, LIGHT, TEXT, INPUT_BG, INPUT_COLOR } = colors;
+
     const [step, setStep] = useState(0);
     const [type, setType] = useState(null);
     const [count, setCount] = useState('24');
@@ -20,7 +21,7 @@ export default function SetupView({ S, setS, startTournament, isAdmin }) {
 
     const canStart = names.length > 0 && names.every(p => p.name.trim());
     const inp = {
-        background: CARD, border: `1px solid ${BORDER}`, color: '#fff',
+        background: INPUT_BG, border: `1px solid ${BORDER}`, color: INPUT_COLOR,
         padding: '10px 14px', borderRadius: 4, fontSize: 15, outline: 'none',
         boxSizing: 'border-box', width: '100%'
     };
@@ -30,7 +31,7 @@ export default function SetupView({ S, setS, startTournament, isAdmin }) {
         return (
             <div style={center}>
                 <img src="/marin-bocce-logo.png" alt="Marin Bocce" style={{ height: 120, marginBottom: 16 }} />
-                <h1 style={{ fontSize: 36, fontWeight: 900, color: '#fff', margin: '0 0 6px', letterSpacing: 3 }}>
+                <h1 style={{ fontSize: 36, fontWeight: 900, color: TEXT, margin: '0 0 6px', letterSpacing: 3 }}>
                     MARIN BOCCE
                 </h1>
                 <p style={{ color: GREEN, fontSize: 16, marginBottom: 24, letterSpacing: 2, fontWeight: 700 }}>
@@ -51,11 +52,10 @@ export default function SetupView({ S, setS, startTournament, isAdmin }) {
         );
     }
 
-    // Step 0: Singles or Teams
     if (step === 0) return (
         <div style={center}>
             <img src="/marin-bocce-logo.png" alt="Marin Bocce" style={{ height: 120, marginBottom: 16 }} />
-            <h1 style={{ fontSize: 36, fontWeight: 900, color: '#fff', margin: '0 0 6px', letterSpacing: 3 }}>
+            <h1 style={{ fontSize: 36, fontWeight: 900, color: TEXT, margin: '0 0 6px', letterSpacing: 3 }}>
                 MARIN BOCCE
             </h1>
             <p style={{ color: GREEN, fontSize: 16, marginBottom: 48, letterSpacing: 2, fontWeight: 700 }}>
@@ -66,7 +66,7 @@ export default function SetupView({ S, setS, startTournament, isAdmin }) {
                 {['Singles', 'Teams'].map(t => (
                     <button key={t} onClick={() => { setType(t); setS(p => ({ ...p, isTeams: t === 'Teams' })); }} style={{
                         padding: '16px 40px', borderRadius: 6, fontWeight: 700, fontSize: 20, cursor: 'pointer',
-                        background: type === t ? GREEN : CARD, color: type === t ? BG : LIGHT,
+                        background: type === t ? GREEN : CARD, color: type === t ? '#fff' : LIGHT,
                         border: `2px solid ${type === t ? GREEN : BORDER}`, letterSpacing: 1, transition: 'all .2s',
                     }}>
                         {t}
@@ -77,19 +77,15 @@ export default function SetupView({ S, setS, startTournament, isAdmin }) {
         </div>
     );
 
-    // Step 1: Tournament Name
     if (step === 1) return (
         <div style={center}>
-            <h2 style={{ color: '#fff', marginBottom: 8, fontSize: 30, letterSpacing: 2 }}>
-                TOURNAMENT NAME
-            </h2>
+            <h2 style={{ color: TEXT, marginBottom: 8, fontSize: 30, letterSpacing: 2 }}>TOURNAMENT NAME</h2>
             <p style={{ color: MUTED, marginBottom: 24 }}>Give this tournament a name</p>
             <input
                 style={{ ...inp, fontSize: 22, textAlign: 'center', maxWidth: 400, margin: '0 auto 24px', display: 'block' }}
                 value={tournamentName}
                 onChange={e => setTournamentName(e.target.value)}
-                placeholder="e.g. Spring Classic 2026"
-                autoFocus
+                placeholder="e.g. Spring Classic 2026" autoFocus
             />
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
                 <Btn variant="secondary" onClick={() => setStep(0)}>← Back</Btn>
@@ -101,10 +97,9 @@ export default function SetupView({ S, setS, startTournament, isAdmin }) {
         </div>
     );
 
-    // Step 2: Player Count
     if (step === 2) return (
         <div style={center}>
-            <h2 style={{ color: '#fff', marginBottom: 8, fontSize: 30, letterSpacing: 2 }}>
+            <h2 style={{ color: TEXT, marginBottom: 8, fontSize: 30, letterSpacing: 2 }}>
                 HOW MANY {S.isTeams ? 'TEAMS' : 'PLAYERS'}?
             </h2>
             <p style={{ color: MUTED, marginBottom: 24 }}>Must be divisible by 4 for even pods</p>
@@ -120,10 +115,9 @@ export default function SetupView({ S, setS, startTournament, isAdmin }) {
         </div>
     );
 
-    // Step 3: Player Names
     return (
         <div style={{ maxWidth: 660, margin: '0 auto' }}>
-            <h2 style={{ color: '#fff', marginBottom: 4, fontSize: 26, letterSpacing: 2 }}>
+            <h2 style={{ color: TEXT, marginBottom: 4, fontSize: 26, letterSpacing: 2 }}>
                 ENTER {S.isTeams ? 'TEAM' : 'PLAYER'} NAMES
             </h2>
             <p style={{ color: MUTED, marginBottom: 4, fontSize: 14 }}>

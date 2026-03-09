@@ -1,9 +1,10 @@
-import { COLORS } from '../logic/constants';
+import { useTheme } from '../ThemeContext';
 import { Btn } from './ui';
 import { signInWithGoogle, signOut } from '../firebase/auth';
 
 export default function Header({ S, setTab, onReset, onArchive, isAdmin, user }) {
-    const { PANEL, GREEN, MUTED, YELLOW, RED } = COLORS;
+    const { colors, isDark, toggle } = useTheme();
+    const { PANEL, GREEN, MUTED, YELLOW, BORDER, TEXT } = colors;
     const phase = S.phase;
     const tab = S.tab;
 
@@ -13,7 +14,7 @@ export default function Header({ S, setTab, onReset, onArchive, isAdmin, user })
             ? ['winners', 'bracket', 'standings', 'history']
             : phase === 'pods'
                 ? ['games', 'standings', 'bracket', 'history']
-                : ['bracket', 'standings', 'history'];
+                : ['bracket', 'standings', 'games', 'history'];
 
     return (
         <div style={{
@@ -30,7 +31,7 @@ export default function Header({ S, setTab, onReset, onArchive, isAdmin, user })
                 <div>
                     <div style={{
                         fontSize: 16, fontWeight: 900, letterSpacing: 2,
-                        color: '#fff', textTransform: 'uppercase', lineHeight: 1.1
+                        color: TEXT, textTransform: 'uppercase', lineHeight: 1.1
                     }}>
                         <span style={{ color: GREEN }}>MARIN BOCCE</span>
                     </div>
@@ -55,8 +56,17 @@ export default function Header({ S, setTab, onReset, onArchive, isAdmin, user })
                 ))}
             </div>
 
-            {/* Auth + Admin Controls */}
+            {/* Auth + Admin + Theme Toggle */}
             <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap' }}>
+                {/* Theme Toggle */}
+                <button onClick={toggle} style={{
+                    background: 'none', border: `1px solid ${BORDER}`, borderRadius: 4,
+                    cursor: 'pointer', padding: '4px 8px', fontSize: 16, lineHeight: 1,
+                    color: MUTED, transition: 'color .2s',
+                }} title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
+                    {isDark ? '☀️' : '🌙'}
+                </button>
+
                 {isAdmin ? (
                     <>
                         <span style={{ fontSize: 11, color: GREEN, letterSpacing: 0.5 }}>

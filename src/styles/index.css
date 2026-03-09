@@ -1,17 +1,27 @@
 /* ===== BOCCE TOURNAMENT — GLOBAL STYLES ===== */
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* Light mode (default) */
+[data-theme="light"] body,
 body {
-  background: #060a14;
-  color: #c0ccde;
+  background: #f4f6f9;
+  color: #3a4355;
   font-family: 'Barlow Condensed', system-ui, sans-serif;
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Dark mode */
+[data-theme="dark"] body {
+  background: #060a14;
+  color: #c0ccde;
 }
 
 /* Hide number input spinners */
@@ -19,20 +29,47 @@ input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
 }
+
 input[type=number] {
   -moz-appearance: textfield;
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #0b1020; }
-::-webkit-scrollbar-thumb { background: #1c2b47; border-radius: 3px; }
+/* Scrollbar — light */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
 
-table { border-collapse: collapse; width: 100%; }
+::-webkit-scrollbar-track {
+  background: #eef0f4;
+}
 
-/* Focus styles for accessibility */
+::-webkit-scrollbar-thumb {
+  background: #c0c8d4;
+  border-radius: 3px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #0b1020;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #1c2b47;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+/* Focus styles */
 button:focus-visible,
 input:focus-visible {
-  outline: 2px solid #00e676;
+  outline: 2px solid #0d9e4f;
   outline-offset: 2px;
+}
+
+[data-theme="dark"] button:focus-visible,
+[data-theme="dark"] input:focus-visible {
+  outline-color: #00e676;
 }

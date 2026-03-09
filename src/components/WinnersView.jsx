@@ -1,9 +1,10 @@
-import { COLORS } from '../logic/constants';
+import { useTheme } from '../ThemeContext';
 import { calcStandings } from '../logic/standings';
 
-const { CARD, BORDER, PANEL, GREEN, YELLOW, BLUE, RED, MUTED, LIGHT } = COLORS;
-
 export default function WinnersView({ S, name }) {
+    const { colors } = useTheme();
+    const { CARD, BORDER, PANEL, GREEN, YELLOW, BLUE, RED, MUTED, LIGHT, TEXT, CHAMP_BG } = colors;
+
     const { bracketGames, bracketSeeds, tournamentName } = S;
     if (!bracketGames || bracketGames.length === 0) return null;
 
@@ -20,21 +21,20 @@ export default function WinnersView({ S, name }) {
         ? (thirdG.score1 > thirdG.score2 ? thirdG.p2Id : thirdG.p1Id) : null;
 
     const podiums = [
-        { place: '🥇 Champion', pid: champion, color: YELLOW, bg: '#1a1200', borderColor: YELLOW },
-        { place: '🥈 Runner-Up', pid: runnerUp, color: '#c0c0c0', bg: '#14141a', borderColor: '#666' },
-        { place: '🥉 3rd Place', pid: third, color: '#cd7f32', bg: '#1a1408', borderColor: '#8b5e3c' },
+        { place: '🥇 Champion', pid: champion, color: YELLOW, bg: CHAMP_BG, borderColor: YELLOW },
+        { place: '🥈 Runner-Up', pid: runnerUp, color: '#888', bg: CARD, borderColor: '#666' },
+        { place: '🥉 3rd Place', pid: third, color: '#cd7f32', bg: CARD, borderColor: '#8b5e3c' },
         { place: '4th Place', pid: fourth, color: MUTED, bg: CARD, borderColor: BORDER },
     ];
 
     return (
         <div style={{ maxWidth: 600, margin: '0 auto', textAlign: 'center' }}>
-            {/* Trophy header */}
             <div style={{ marginBottom: 32 }}>
                 <img src="/marin-bocce-logo.png" alt="Marin Bocce" style={{ height: 80, marginBottom: 12 }} />
                 <div style={{ fontSize: 14, color: GREEN, fontWeight: 700, letterSpacing: 2, textTransform: 'uppercase', marginBottom: 4 }}>
                     {tournamentName || 'Tournament'}
                 </div>
-                <h1 style={{ fontSize: 36, fontWeight: 900, color: '#fff', letterSpacing: 3, marginBottom: 4 }}>
+                <h1 style={{ fontSize: 36, fontWeight: 900, color: TEXT, letterSpacing: 3, marginBottom: 4 }}>
                     FINAL RESULTS
                 </h1>
                 <div style={{ color: MUTED, fontSize: 13 }}>
@@ -42,7 +42,6 @@ export default function WinnersView({ S, name }) {
                 </div>
             </div>
 
-            {/* Podium cards */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
                 {podiums.filter(p => p.pid).map(({ place, pid, color, bg, borderColor }, i) => (
                     <div key={i} style={{
@@ -58,7 +57,6 @@ export default function WinnersView({ S, name }) {
                                 {name(pid).toUpperCase()}
                             </div>
                         </div>
-                        {/* Seed info */}
                         {bracketSeeds && (() => {
                             const seed = bracketSeeds.find(s => s.pid === pid);
                             return seed ? (
@@ -72,7 +70,6 @@ export default function WinnersView({ S, name }) {
                 ))}
             </div>
 
-            {/* Championship score */}
             {finalG?.status === 'completed' && (
                 <div style={{
                     background: CARD, border: `1px solid ${BORDER}`, borderRadius: 8,
@@ -95,7 +92,6 @@ export default function WinnersView({ S, name }) {
                 </div>
             )}
 
-            {/* 3rd place score */}
             {thirdG?.status === 'completed' && (
                 <div style={{
                     background: CARD, border: `1px solid ${BORDER}`, borderRadius: 8,

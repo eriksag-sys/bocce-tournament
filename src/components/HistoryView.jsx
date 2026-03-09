@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { COLORS, POD_NAMES, POD_COLORS } from '../logic/constants';
+import { useTheme } from '../ThemeContext';
+import { POD_NAMES } from '../logic/constants';
 import { Btn, Pill } from './ui';
 
-const { CARD, BORDER, PANEL, GREEN, YELLOW, BLUE, RED, MUTED, LIGHT } = COLORS;
-
 export default function HistoryView({ history, isAdmin, onDelete }) {
+    const { colors, podColors } = useTheme();
+    const { CARD, BORDER, PANEL, GREEN, YELLOW, BLUE, RED, MUTED, LIGHT, TEXT } = colors;
+
     const [expanded, setExpanded] = useState(null);
 
     if (!history || history.length === 0) {
@@ -26,16 +28,15 @@ export default function HistoryView({ history, isAdmin, onDelete }) {
 
     return (
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
-            <h2 style={{ color: '#fff', fontSize: 24, fontWeight: 900, letterSpacing: 2, marginBottom: 16 }}>
+            <h2 style={{ color: TEXT, fontSize: 24, fontWeight: 900, letterSpacing: 2, marginBottom: 16 }}>
                 TOURNAMENT HISTORY
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                 {[...history].reverse().map((t, ri) => {
-                    const idx = history.length - 1 - ri; // actual index in array
+                    const idx = history.length - 1 - ri;
                     const d = t.date ? new Date(t.date) : null;
                     const dateStr = d ? d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
 
-                    // Find champion
                     const finalG = t.bracketGames?.find(g => g.id === 'final');
                     const champion = finalG?.status === 'completed'
                         ? (finalG.score1 > finalG.score2 ? finalG.p1Id : finalG.p2Id)
@@ -56,7 +57,6 @@ export default function HistoryView({ history, isAdmin, onDelete }) {
                             background: CARD, border: `1px solid ${champion ? GREEN + '44' : BORDER}`,
                             borderRadius: 8, overflow: 'hidden'
                         }}>
-                            {/* Summary row */}
                             <div
                                 style={{
                                     padding: '14px 16px', cursor: 'pointer', display: 'flex',
@@ -66,7 +66,7 @@ export default function HistoryView({ history, isAdmin, onDelete }) {
                                 onClick={() => setExpanded(isExpanded ? null : idx)}
                             >
                                 <div>
-                                    <div style={{ fontSize: 18, fontWeight: 800, color: '#fff', letterSpacing: 1 }}>
+                                    <div style={{ fontSize: 18, fontWeight: 800, color: TEXT, letterSpacing: 1 }}>
                                         {t.tournamentName || 'Unnamed Tournament'}
                                     </div>
                                     <div style={{ fontSize: 12, color: MUTED, marginTop: 2 }}>
@@ -86,15 +86,13 @@ export default function HistoryView({ history, isAdmin, onDelete }) {
                                 </div>
                             </div>
 
-                            {/* Expanded details */}
                             {isExpanded && (
                                 <div style={{ padding: '0 16px 16px', borderTop: `1px solid ${BORDER}` }}>
-                                    {/* Top finishers */}
                                     {champion && (
                                         <div style={{ display: 'flex', gap: 12, marginTop: 12, marginBottom: 12, flexWrap: 'wrap' }}>
                                             {[
                                                 { label: '🥇 1st', pid: champion, color: YELLOW },
-                                                { label: '🥈 2nd', pid: finalG?.status === 'completed' ? (finalG.score1 > finalG.score2 ? finalG.p2Id : finalG.p1Id) : null, color: '#c0c0c0' },
+                                                { label: '🥈 2nd', pid: finalG?.status === 'completed' ? (finalG.score1 > finalG.score2 ? finalG.p2Id : finalG.p1Id) : null, color: '#888' },
                                                 { label: '🥉 3rd', pid: third, color: '#cd7f32' },
                                             ].filter(p => p.pid).map(({ label, pid, color }) => (
                                                 <div key={label} style={{
@@ -108,7 +106,6 @@ export default function HistoryView({ history, isAdmin, onDelete }) {
                                         </div>
                                     )}
 
-                                    {/* Bracket Seeds */}
                                     {t.bracketSeeds && t.bracketSeeds.length > 0 && (
                                         <div style={{ marginBottom: 12 }}>
                                             <div style={{ fontSize: 11, color: MUTED, letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>
@@ -130,7 +127,6 @@ export default function HistoryView({ history, isAdmin, onDelete }) {
                                         </div>
                                     )}
 
-                                    {/* Delete button */}
                                     {isAdmin && (
                                         <div style={{ marginTop: 12, borderTop: `1px solid ${BORDER}`, paddingTop: 12 }}>
                                             <Btn variant="red" style={{ fontSize: 12, padding: '6px 14px' }}

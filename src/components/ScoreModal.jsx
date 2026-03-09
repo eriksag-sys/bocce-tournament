@@ -1,18 +1,20 @@
 import { useState } from 'react';
-import { COLORS } from '../logic/constants';
+import { useTheme } from '../ThemeContext';
 import { Btn, Pill } from './ui';
 
-const { CARD, BORDER, PANEL, GREEN, YELLOW, BLUE, MUTED } = COLORS;
-
 export default function ScoreModal({ game, name, onSubmit, onClose }) {
-    const [s1, setS1] = useState('');
-    const [s2, setS2] = useState('');
+    const { colors } = useTheme();
+    const { CARD, BORDER, PANEL, GREEN, YELLOW, BLUE, MUTED, TEXT, INPUT_BG, INPUT_COLOR, OVERLAY } = colors;
+
+    const isEdit = game.status === 'completed';
+    const [s1, setS1] = useState(isEdit ? String(game.score1) : '');
+    const [s2, setS2] = useState(isEdit ? String(game.score2) : '');
     const n1 = parseInt(s1), n2 = parseInt(s2);
     const both = s1 !== '' && s2 !== '';
     const valid = both && !isNaN(n1) && !isNaN(n2) && n1 !== n2 && n1 >= 0 && n2 >= 0 && n1 <= 12 && n2 <= 12 && (n1 === 12 || n2 === 12);
 
     const inp = {
-        background: CARD, border: `1px solid ${BORDER}`, color: '#fff',
+        background: INPUT_BG, border: `1px solid ${BORDER}`, color: INPUT_COLOR,
         padding: '10px', borderRadius: 4, fontSize: 36, textAlign: 'center',
         outline: 'none', width: '100%', boxSizing: 'border-box'
     };
@@ -24,14 +26,14 @@ export default function ScoreModal({ game, name, onSubmit, onClose }) {
 
     return (
         <div onKeyDown={handleKey} style={{
-            position: 'fixed', inset: 0, background: 'rgba(0,0,0,.92)',
+            position: 'fixed', inset: 0, background: OVERLAY,
             display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
         }} onClick={e => e.target === e.currentTarget && onClose()}>
             <div style={{
                 background: PANEL, border: `2px solid ${GREEN}`, borderRadius: 12,
                 padding: 32, minWidth: 360, width: '92%', maxWidth: 460
             }}>
-                <div style={{ marginBottom: 4, fontSize: 22, fontWeight: 900, color: '#fff', letterSpacing: 1 }}>
+                <div style={{ marginBottom: 4, fontSize: 22, fontWeight: 900, color: TEXT, letterSpacing: 1 }}>
                     ENTER SCORE
                 </div>
                 {game.courtId && (

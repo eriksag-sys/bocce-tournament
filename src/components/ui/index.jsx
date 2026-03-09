@@ -1,7 +1,8 @@
-import { COLORS } from '../../logic/constants';
+import { useTheme } from '../../ThemeContext';
 
 export function Btn({ children, variant = 'primary', onClick, disabled, style = {} }) {
-    const { BORDER, GREEN, YELLOW, RED, CARD, MUTED, LIGHT, BG } = COLORS;
+    const { colors } = useTheme();
+    const { BORDER, GREEN, YELLOW, RED, CARD, MUTED, LIGHT, BG } = colors;
 
     return (
         <button disabled={disabled} onClick={onClick} style={{
@@ -14,7 +15,7 @@ export function Btn({ children, variant = 'primary', onClick, disabled, style = 
                         : variant === 'red' ? RED
                             : CARD,
             color: disabled ? MUTED
-                : (variant === 'primary' || variant === 'yellow') ? BG
+                : (variant === 'primary' || variant === 'yellow') ? '#fff'
                     : LIGHT,
             opacity: disabled ? 0.6 : 1,
             transition: 'opacity .2s',
@@ -38,7 +39,8 @@ export function Pill({ color, text }) {
 }
 
 export function PlayerRow({ name, score, win }) {
-    const { GREEN, LIGHT, RED } = COLORS;
+    const { colors } = useTheme();
+    const { GREEN, LIGHT, RED } = colors;
     return (
         <div style={{
             display: 'flex', justifyContent: 'space-between',
@@ -74,7 +76,8 @@ export function SectionHeader({ children, color }) {
 }
 
 export function StatBox({ label, val, col }) {
-    const { CARD, BORDER, MUTED } = COLORS;
+    const { colors } = useTheme();
+    const { CARD, BORDER, MUTED } = colors;
     return (
         <div style={{
             background: CARD, border: `1px solid ${BORDER}`,
